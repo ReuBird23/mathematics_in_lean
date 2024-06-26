@@ -39,17 +39,59 @@ example : min a b = min b a := by
     apply min_le_left
 
 example : max a b = max b a := by
-  sorry
+  apply le_antisymm
+  . show max a b ≤ max b a
+    apply max_le
+    . apply le_max_right
+    . apply le_max_left
+  . show max b a ≤ max a b
+    apply max_le
+    . apply le_max_right
+    . apply le_max_left
+
 example : min (min a b) c = min a (min b c) := by
-  sorry
+  apply le_antisymm
+  . apply le_min
+    . calc min (min a b) c ≤ min a b := by apply min_le_left
+      _ ≤ a := by apply min_le_left
+    . apply le_min
+      . calc min (min a b) c ≤ min a b := by apply min_le_left
+        _ ≤ b := by apply min_le_right
+      . apply min_le_right
+  . apply le_min
+    . apply le_min
+      . apply min_le_left
+      . calc min a (min b c) ≤ min b c := by apply min_le_right
+        _ ≤ b := by apply min_le_left
+    . calc min a (min b c) ≤ min b c := by apply min_le_right
+      _ ≤ c := by apply min_le_right
+
 theorem aux : min a b + c ≤ min (a + c) (b + c) := by
-  sorry
+  apply le_min
+  . apply add_le_add_right
+    apply min_le_left
+  . apply add_le_add_right
+    apply min_le_right
+
 example : min a b + c = min (a + c) (b + c) := by
-  sorry
+  apply le_antisymm
+  . apply aux
+  . sorry
+
 #check (abs_add : ∀ a b : ℝ, |a + b| ≤ |a| + |b|)
 
+#check sub_add_cancel
+
 example : |a| - |b| ≤ |a - b| :=
-  sorry
+  calc |a| - |b| ≤ |a - b + b| - |b|
+  := by rw [sub_add_cancel]
+  _ ≤ |a - b| + |b| - |b| := by
+    apply sub_le_sub_right
+    apply abs_add
+  _ ≤ |a - b| := by
+    rw [add_sub_cancel_right]
+
+
 end
 
 section
@@ -66,7 +108,15 @@ example : x ∣ x ^ 2 := by
   apply dvd_mul_left
 
 example (h : x ∣ w) : x ∣ y * (x * z) + x ^ 2 + w ^ 2 := by
-  sorry
+  apply dvd_add
+  . apply dvd_add
+    . apply dvd_mul_of_dvd_right
+      apply dvd_mul_right
+    apply dvd_mul_left
+  rw [pow_two]
+  apply dvd_mul_of_dvd_right
+  apply h
+
 end
 
 section
