@@ -77,13 +77,31 @@ example : x ⊔ y = y ⊔ x := by
 example : x ⊔ y ⊔ z = x ⊔ (y ⊔ z) := by
   apply le_antisymm
   . apply sup_le
-    . sorry
-    . sorry
-  . sorry
+    . apply sup_le
+      . apply le_sup_left
+      . apply @le_trans _ _ y (y ⊔ z) (x ⊔ (y ⊔ z))
+        . apply le_sup_left
+        . apply le_sup_right
+    . apply @le_trans _ _ z (y ⊔ z) (x ⊔ (y ⊔ z))
+      . apply le_sup_right
+      . apply le_sup_right
+  . apply sup_le
+    . apply @le_trans _ _ x (x ⊔ y) (x ⊔ y ⊔ z)
+      . apply le_sup_left
+      . apply le_sup_left
+    . apply sup_le
+      . apply @le_trans _ _ y (x ⊔ y) (x ⊔ y ⊔ z)
+        . apply le_sup_right
+        . apply le_sup_left
+      . apply le_sup_right
 
 
 theorem absorb1 : x ⊓ (x ⊔ y) = x := by
-  sorry
+  apply le_antisymm
+  . apply inf_le_left
+  . apply le_inf
+    . rfl
+    . apply le_sup_left
 
 theorem absorb2 : x ⊔ x ⊓ y = x := by
   sorry
