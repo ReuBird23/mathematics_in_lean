@@ -104,7 +104,11 @@ theorem absorb1 : x ⊓ (x ⊔ y) = x := by
     . apply le_sup_left
 
 theorem absorb2 : x ⊔ x ⊓ y = x := by
-  sorry
+  apply le_antisymm
+  . apply sup_le
+    . rfl
+    . apply inf_le_left
+  . apply le_sup_left
 
 end
 
@@ -123,10 +127,12 @@ variable {α : Type*} [Lattice α]
 variable (a b c : α)
 
 example (h : ∀ x y z : α, x ⊓ (y ⊔ z) = x ⊓ y ⊔ x ⊓ z) : a ⊔ b ⊓ c = (a ⊔ b) ⊓ (a ⊔ c) := by
-  sorry
+  rw [h, @inf_comm _ _ (a ⊔ b), absorb1, @inf_comm _ _ (a ⊔ b), h, ← sup_assoc,
+  @inf_comm _ _ c a, absorb2, inf_comm]
 
 example (h : ∀ x y z : α, x ⊔ y ⊓ z = (x ⊔ y) ⊓ (x ⊔ z)) : a ⊓ (b ⊔ c) = a ⊓ b ⊔ a ⊓ c := by
-  sorry
+  rw [h, @sup_comm _ _ (a ⊓ b), absorb2, @sup_comm _ _ (a ⊓ b), h, ← inf_assoc, @sup_comm _ _ c a,
+    absorb1, sup_comm]
 
 end
 
@@ -139,14 +145,20 @@ variable (a b c : R)
 
 #check (mul_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a * b)
 
-example (h : a ≤ b) : 0 ≤ b - a := by
-  sorry
+theorem aux1 (h : a ≤ b) : 0 ≤ b - a := by
+  rw [← sub_self a]
+  apply sub_le_sub_right
+  apply h
 
-example (h: 0 ≤ b - a) : a ≤ b := by
-  sorry
+theorem aux2 (h: 0 ≤ b - a) : a ≤ b := by
+  rw [← add_zero a, ← sub_add_cancel b a, add_comm (b-a)]
+  apply add_le_add_left
+  apply h
 
 example (h : a ≤ b) (h' : 0 ≤ c) : a * c ≤ b * c := by
-  sorry
+  have h1 : 0 ≤ (b - a) * c := mul_nonneg (aux1 _ _ h) h'
+  rw [sub_mul] at h1
+  exact aux2 _ _ h1
 
 end
 
@@ -159,6 +171,9 @@ variable (x y z : X)
 #check (dist_triangle x y z : dist x z ≤ dist x y + dist y z)
 
 example (x y : X) : 0 ≤ dist x y := by
-  sorry
+  have : 0 ≤ dist x y + dist y x := by
+    rw [← dist_self x]
+    apply dist_triangle
+  linarith [dist_comm x y]
 
 end
